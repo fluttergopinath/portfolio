@@ -1,0 +1,1 @@
+ /Users/somuit/Documents/project/Portfolio/build/8d0befdb8f7faa161b68704267aff64b/dart_build_result.json:  /Users/somuit/Development/flutter/bin/cache/dart-sdk/version /Users/somuit/Documents/project/Portfolio/.dart_tool/package_config.json /Users/somuit/Documents/project/Portfolio/pubspec.yaml
