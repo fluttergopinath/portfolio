@@ -5,6 +5,8 @@ import '../../core/constants/app_data.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/responsive.dart';
 import '../projects/project_detail_dialog.dart';
+import '../../widgets/glass_card.dart';
+import '../../widgets/tilt_widget.dart';
 
 class ProjectsSection extends StatelessWidget {
   final GlobalKey sectionKey;
@@ -24,19 +26,19 @@ class ProjectsSection extends StatelessWidget {
           width: Responsive.contentWidth(context),
           child: Column(
             children: [
-              _SectionHeader(
+              const _SectionHeader(
                 title: AppStrings.projectsTitle,
-                subtitle: AppStrings.projectsSubtitle,
+                subtitle: 'SHOWCASING RECENT VENTURES',
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 80),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isMobile ? 1 : 2,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 24,
-                  childAspectRatio: isMobile ? 1.4 : 1.05,
+                  crossAxisSpacing: 32,
+                  mainAxisSpacing: 32,
+                  childAspectRatio: isMobile ? 1.2 : 1.1,
                 ),
                 itemCount: ProjectData.projects.length,
                 itemBuilder: (context, index) {
@@ -63,23 +65,35 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(title, style: Theme.of(context).textTheme.displaySmall),
-        const SizedBox(height: 8),
+        Text(
+          subtitle,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppColors.secondary,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 4,
+                fontSize: 10,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          title.toUpperCase(),
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                fontSize: Responsive.isMobile(context) ? 32 : 48,
+                letterSpacing: -1,
+              ),
+        ),
+        const SizedBox(height: 20),
         Container(
-          width: 50,
-          height: 3,
+          width: 60,
+          height: 4,
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(height: 12),
-        Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
       ],
-    )
-        .animate()
-        .fadeIn(duration: 600.ms)
-        .slideY(begin: 0.3, end: 0, duration: 600.ms);
+    ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.2, end: 0);
   }
 }
 
@@ -98,7 +112,6 @@ class _ProjectCardState extends State<_ProjectCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final accent = widget.project.accentColor;
 
     return MouseRegion(
@@ -107,195 +120,134 @@ class _ProjectCardState extends State<_ProjectCard> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () => _showProjectDetail(context),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeOutCubic,
-          transform: _isHovered
-              ? (Matrix4.identity()..translate(0.0, -8.0, 0.0))
-              : Matrix4.identity(),
-          // Gradient border wrapper
-          child: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              gradient: _isHovered
-                  ? LinearGradient(
-                      colors: [accent, AppColors.primary],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : LinearGradient(
-                      colors: [
-                        accent.withValues(alpha: 0.15),
-                        AppColors.primary.withValues(alpha: 0.05),
-                      ],
+        child: TiltWidget(
+          maxTilt: 0.08,
+          scale: 1.02,
+          child: GlassCard(
+            borderRadius: 32,
+            padding: EdgeInsets.zero,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Project Icon / Emoji with Gradient Background
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          accent.withOpacity(0.1),
+                          AppColors.primary.withOpacity(0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(32),
+                      ),
                     ),
-              boxShadow: _isHovered
-                  ? [
-                      BoxShadow(
-                        color: accent.withValues(alpha: 0.2),
-                        blurRadius: 30,
-                        offset: const Offset(0, 12),
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkCard : AppColors.lightSurface,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header: emoji + title
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: accent.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Center(
-                          child: Text(
-                            widget.project.emoji,
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.project.title,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontSize: 18),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              widget.project.subtitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(color: accent),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Description
-                  Expanded(
-                    child: Text(
-                      widget.project.description,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            height: 1.5,
-                          ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  // Tech chips
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: widget.project.techStack.take(Responsive.isMobile(context) ? 3 : 4).map((tech) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: accent.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(6),
+                          color: Colors.white.withOpacity(0.05),
+                          shape: BoxShape.circle,
                           border: Border.all(
-                            color: accent.withValues(alpha: 0.15),
+                            color: Colors.white.withOpacity(0.1),
                           ),
                         ),
                         child: Text(
-                          tech,
-                          style:
-                              Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    fontSize: 11,
-                                    color: accent,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                          widget.project.emoji,
+                          style: const TextStyle(fontSize: 48),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  // View Details
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _isHovered
-                          ? accent.withValues(alpha: 0.1)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: accent.withValues(alpha: 0.2),
-                      ),
+                      ).animate(target: _isHovered ? 1 : 0).scale(
+                            begin: const Offset(1, 1),
+                            end: const Offset(1.15, 1.15),
+                            duration: 400.ms,
+                            curve: Curves.easeOutBack,
+                          ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  ),
+                ),
+                // Content
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'View Details',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: accent,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  ),
+                          widget.project.title,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 24,
+                              ),
                         ),
-                        const SizedBox(width: 6),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          transform: _isHovered
-                              ? (Matrix4.identity()..translate(4.0, 0.0, 0.0))
-                              : Matrix4.identity(),
-                          child: Icon(
-                            Icons.arrow_forward_rounded,
-                            color: accent,
-                            size: 16,
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.project.subtitle.toUpperCase(),
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                color: accent,
+                                letterSpacing: 2,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 11,
+                              ),
+                        ),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: Text(
+                            widget.project.description,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.white.withOpacity(0.5),
+                                  height: 1.6,
+                                ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Text(
+                              'EXPLORE CASE STUDY',
+                              style:
+                                  Theme.of(context).textTheme.labelLarge?.copyWith(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.5,
+                                      ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 14,
+                              color: Colors.white.withOpacity(0.6),
+                            ).animate(target: _isHovered ? 1 : 0).moveX(
+                                  begin: 0,
+                                  end: 6,
+                                  duration: 300.ms,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn(
-          delay: Duration(milliseconds: 150 + widget.index * 150),
-          duration: 500.ms,
-        )
-        .slideY(
-          begin: 0.15,
-          end: 0,
-          delay: Duration(milliseconds: 150 + widget.index * 150),
-          duration: 500.ms,
-        );
+    ).animate().fadeIn(delay: (widget.index * 150).ms).slideY(begin: 0.2, end: 0);
   }
 
   void _showProjectDetail(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.75),
+      barrierColor: Colors.black.withOpacity(0.85),
       builder: (ctx) => ProjectDetailDialog(project: widget.project),
     );
   }

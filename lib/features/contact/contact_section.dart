@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/responsive.dart';
+import '../../widgets/glass_card.dart';
 
 class ContactSection extends StatefulWidget {
   final GlobalKey sectionKey;
@@ -29,6 +30,16 @@ class _ContactSectionState extends State<ContactSection> {
   }
 
   void _handleSubmit() {
+    if (_nameController.text.isEmpty || _emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please fill in required fields. ✍️'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
@@ -60,7 +71,6 @@ class _ContactSectionState extends State<ContactSection> {
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       key: widget.sectionKey,
@@ -75,30 +85,30 @@ class _ContactSectionState extends State<ContactSection> {
                 title: AppStrings.contactTitle,
                 subtitle: AppStrings.contactSubtitle,
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 60),
               isMobile
                   ? Column(
                       children: [
-                        _buildForm(context, isDark),
-                        const SizedBox(height: 32),
-                        _buildContactCards(context, isDark),
+                        _buildForm(context),
+                        const SizedBox(height: 48),
+                        _buildContactCards(context),
                       ],
                     )
                   : Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          flex: 6,
-                          child: _buildForm(context, isDark),
+                          flex: 5,
+                          child: _buildForm(context),
                         ),
-                        const SizedBox(width: 36),
+                        const SizedBox(width: 48),
                         Expanded(
                           flex: 4,
-                          child: _buildContactCards(context, isDark),
+                          child: _buildContactCards(context),
                         ),
                       ],
                     ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 100),
               _buildFooter(context),
             ],
           ),
@@ -107,61 +117,61 @@ class _ContactSectionState extends State<ContactSection> {
     );
   }
 
-  Widget _buildForm(BuildContext context, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.darkCard.withValues(alpha: 0.5)
-            : AppColors.lightCard,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.08),
-        ),
-      ),
+  Widget _buildForm(BuildContext context) {
+    return GlassCard(
+      padding: const EdgeInsets.all(32),
+      borderRadius: 32,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '💬 Send me a message',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: 18,
+            'SEND A MESSAGE',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                  fontSize: 12,
+                  color: AppColors.primary.withOpacity(0.8),
                 ),
           ),
-          const SizedBox(height: 24),
-          _GlowTextField(
+          const SizedBox(height: 12),
+          Text(
+            "Let's create something extraordinary",
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                ),
+          ),
+          const SizedBox(height: 32),
+          _CustomTextField(
             controller: _nameController,
             hintText: 'Your Name',
-            icon: Icons.person_rounded,
+            icon: Icons.person_outline_rounded,
           ),
-          const SizedBox(height: 16),
-          _GlowTextField(
+          const SizedBox(height: 20),
+          _CustomTextField(
             controller: _emailController,
             hintText: 'Your Email',
-            icon: Icons.email_rounded,
+            icon: Icons.alternate_email_rounded,
             keyboardType: TextInputType.emailAddress,
           ),
-          const SizedBox(height: 16),
-          _GlowTextField(
+          const SizedBox(height: 20),
+          _CustomTextField(
             controller: _messageController,
             hintText: 'Tell me about your project...',
-            icon: Icons.message_rounded,
-            maxLines: 5,
+            icon: Icons.chat_bubble_outline_rounded,
+            maxLines: 6,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           _SubmitButton(
             isLoading: _isSubmitting,
             onTap: _handleSubmit,
           ),
         ],
       ),
-    )
-        .animate()
-        .fadeIn(delay: 200.ms, duration: 600.ms)
-        .slideX(begin: -0.1, end: 0, delay: 200.ms, duration: 600.ms);
+    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0);
   }
 
-  Widget _buildContactCards(BuildContext context, bool isDark) {
+  Widget _buildContactCards(BuildContext context) {
     return Column(
       children: [
         _ContactInfoCard(
@@ -172,115 +182,121 @@ class _ContactSectionState extends State<ContactSection> {
           onTap: () => _launchUrl('mailto:${AppStrings.email}'),
           index: 0,
         ),
-        const SizedBox(height: 14),
-        _ContactInfoCard(
-          emoji: '📞',
-          title: 'Phone',
-          subtitle: AppStrings.phone,
-          color: const Color(0xFF4ADE80),
-          onTap: () => _launchUrl('tel:${AppStrings.phone}'),
-          index: 1,
-        ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         _ContactInfoCard(
           emoji: '💼',
           title: 'LinkedIn',
-          subtitle: 'Connect with me',
+          subtitle: 'Gopinath MJ',
           color: const Color(0xFF0A66C2),
           onTap: () => _launchUrl(AppStrings.linkedInUrl),
-          index: 2,
+          index: 1,
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         _ContactInfoCard(
           emoji: '🐙',
           title: 'GitHub',
-          subtitle: 'Check my repos',
-          color: isDark ? Colors.white : Colors.black87,
+          subtitle: 'github.com/fluttergopinath',
+          color: Colors.white,
           onTap: () => _launchUrl(AppStrings.githubUrl),
-          index: 3,
+          index: 2,
         ),
-        const SizedBox(height: 28),
-        // CTA Card
+        const SizedBox(height: 32),
+        // Availability Card
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primary.withValues(alpha: 0.1),
-                AppColors.accent.withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(18),
+            color: AppColors.primary.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.15),
+              color: AppColors.primary.withOpacity(0.1),
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('🚀', style: TextStyle(fontSize: 28)),
-              const SizedBox(height: 12),
-              Text(
-                "Let's build together",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontSize: 17,
+              Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF4ADE80),
+                      shape: BoxShape.circle,
                     ),
+                  ).animate(onPlay: (controller) => controller.repeat())
+                    .scale(duration: 1000.ms, begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2))
+                    .then()
+                    .scale(duration: 1000.ms, begin: const Offset(1.2, 1.2), end: const Offset(0.8, 0.8)),
+                  const SizedBox(width: 12),
+                  Text(
+                    'AVAILABLE FOR PROJECTS',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                          fontSize: 11,
+                          color: const Color(0xFF4ADE80),
+                        ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               Text(
-                'Available for freelance projects and full-time opportunities.',
-                style: Theme.of(context).textTheme.bodyMedium,
+                'I am currently open to freelance opportunities and full-time positions where I can contribute to impactful Flutter applications.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  height: 1.6,
+                  color: Colors.white.withOpacity(0.6),
+                ),
               ),
             ],
           ),
-        )
-            .animate()
-            .fadeIn(delay: 800.ms, duration: 600.ms)
-            .slideY(begin: 0.1, end: 0, delay: 800.ms, duration: 600.ms),
+        ).animate().fadeIn(delay: 600.ms, duration: 600.ms),
       ],
     );
   }
 
   Widget _buildFooter(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 28),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.08),
-          ),
+    return Column(
+      children: [
+        Container(
+          width: 60,
+          height: 2,
+          color: AppColors.primary.withOpacity(0.2),
         ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Designed & Built with ',
-                style: Theme.of(context).textTheme.labelLarge,
+        const SizedBox(height: 48),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'MADE WITH ',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                letterSpacing: 2,
+                fontSize: 10,
+                color: Colors.white.withOpacity(0.35),
               ),
-              const Text('💙', style: TextStyle(fontSize: 16)),
-              Text(
-                ' using Flutter',
-                style: Theme.of(context).textTheme.labelLarge,
+            ),
+            const Icon(Icons.favorite_rounded, color: Colors.redAccent, size: 14),
+            Text(
+              ' USING FLUTTER',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                letterSpacing: 2,
+                fontSize: 10,
+                color: Colors.white.withOpacity(0.35),
               ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '© 2025 ${AppStrings.name}',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontSize: 12,
-                ),
-          ),
-        ],
-      ),
-    )
-        .animate()
-        .fadeIn(delay: 600.ms, duration: 500.ms);
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          '© 2025 ${AppStrings.name.toUpperCase()}',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1,
+                fontSize: 11,
+                color: Colors.white.withOpacity(0.2),
+              ),
+        ),
+      ],
+    ).animate().fadeIn(delay: 800.ms);
   }
 }
 
@@ -293,32 +309,37 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(title, style: Theme.of(context).textTheme.displaySmall),
-        const SizedBox(height: 8),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -2,
+              ),
+        ),
+        const SizedBox(height: 16),
         Container(
-          width: 50,
-          height: 3,
+          width: 80,
+          height: 4,
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         SizedBox(
-          width: Responsive.isMobile(context) ? double.infinity : 500,
+          width: 600,
           child: Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: Responsive.isMobile(context) ? 14 : 16,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.white.withOpacity(0.6),
+                  height: 1.5,
+                  fontWeight: FontWeight.w400,
                 ),
           ),
         ),
       ],
-    )
-        .animate()
-        .fadeIn(duration: 600.ms)
-        .slideY(begin: 0.3, end: 0, duration: 600.ms);
+    ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.2, end: 0);
   }
 }
 
@@ -348,8 +369,6 @@ class _ContactInfoCardState extends State<_ContactInfoCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -357,87 +376,78 @@ class _ContactInfoCardState extends State<_ContactInfoCard> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          padding: const EdgeInsets.all(18),
+          duration: 300.ms,
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkCard.withValues(alpha: _isHovered ? 0.8 : 0.5)
-                : AppColors.lightCard.withValues(alpha: _isHovered ? 1 : 0.7),
-            borderRadius: BorderRadius.circular(16),
+            color: _isHovered 
+                ? widget.color.withOpacity(0.1) 
+                : Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: _isHovered
-                  ? widget.color.withValues(alpha: 0.3)
-                  : AppColors.primary.withValues(alpha: 0.05),
+              color: _isHovered 
+                  ? widget.color.withOpacity(0.4) 
+                  : Colors.white.withOpacity(0.05),
+              width: 1.5,
             ),
-            boxShadow: _isHovered
-                ? [
-                    BoxShadow(
-                      color: widget.color.withValues(alpha: 0.1),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : [],
           ),
-          transform: _isHovered
-              ? (Matrix4.identity()..translate(0.0, -3.0, 0.0))
-              : Matrix4.identity(),
           child: Row(
             children: [
-              Text(widget.emoji, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: 14),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: widget.color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(widget.emoji, style: const TextStyle(fontSize: 24)),
+                ),
+              ),
+              const SizedBox(width: 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       widget.title,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontSize: 15,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                            fontSize: 11,
+                            color: Colors.white.withOpacity(0.4),
                           ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       widget.subtitle,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: widget.color,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
                   ],
                 ),
               ),
               Icon(
-                Icons.arrow_outward_rounded,
-                color: widget.color.withValues(alpha: 0.5),
-                size: 18,
+                Icons.arrow_forward_ios_rounded,
+                color: widget.color.withOpacity(0.3),
+                size: 14,
               ),
             ],
           ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn(
-          delay: Duration(milliseconds: 400 + widget.index * 150),
-          duration: 500.ms,
-        )
-        .slideX(
-          begin: 0.15,
-          end: 0,
-          delay: Duration(milliseconds: 400 + widget.index * 150),
-          duration: 500.ms,
-        );
+    ).animate().fadeIn(delay: (400 + widget.index * 100).ms, duration: 600.ms).slideX(begin: 0.1, end: 0);
   }
 }
 
-class _GlowTextField extends StatefulWidget {
+class _CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final IconData icon;
   final int maxLines;
   final TextInputType keyboardType;
 
-  const _GlowTextField({
+  const _CustomTextField({
     required this.controller,
     required this.hintText,
     required this.icon,
@@ -446,50 +456,43 @@ class _GlowTextField extends StatefulWidget {
   });
 
   @override
-  State<_GlowTextField> createState() => _GlowTextFieldState();
+  State<_CustomTextField> createState() => _CustomTextFieldState();
 }
 
-class _GlowTextFieldState extends State<_GlowTextField> {
+class _CustomTextFieldState extends State<_CustomTextField> {
   bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: _isFocused
-            ? [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [],
-      ),
-      child: Focus(
-        onFocusChange: (focused) => setState(() => _isFocused = focused),
+    return Focus(
+      onFocusChange: (focused) => setState(() => _isFocused = focused),
+      child: AnimatedContainer(
+        duration: 300.ms,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(_isFocused ? 0.08 : 0.03),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _isFocused 
+                ? AppColors.primary.withOpacity(0.5) 
+                : Colors.white.withOpacity(0.05),
+          ),
+        ),
         child: TextField(
           controller: widget.controller,
           maxLines: widget.maxLines,
           keyboardType: widget.keyboardType,
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: const TextStyle(color: Colors.white, fontSize: 15),
           decoration: InputDecoration(
             hintText: widget.hintText,
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 16, right: 12),
-              child: Icon(
-                widget.icon,
-                color: _isFocused
-                    ? AppColors.primary
-                    : Theme.of(context)
-                        .textTheme
-                        .labelLarge
-                        ?.color
-                        ?.withValues(alpha: 0.5),
-                size: 20,
-              ),
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            prefixIcon: Icon(
+              widget.icon,
+              color: _isFocused ? AppColors.primary : Colors.white.withOpacity(0.2),
+              size: 20,
             ),
           ),
         ),
@@ -520,53 +523,44 @@ class _SubmitButtonState extends State<_SubmitButton> {
       child: GestureDetector(
         onTap: widget.isLoading ? null : widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+          duration: 300.ms,
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          height: 60,
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: _isHovered
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.45),
-                      blurRadius: 24,
-                      offset: const Offset(0, 8),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+            gradient: _isHovered ? AppColors.primaryGradient : null,
+            color: _isHovered ? null : AppColors.primary.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: _isHovered ? [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              )
+            ] : [],
           ),
-          transform: _isHovered
-              ? (Matrix4.identity()..translate(0.0, -2.0, 0.0))
-              : Matrix4.identity(),
           child: Center(
             child: widget.isLoading
                 ? const SizedBox(
-                    width: 22,
-                    height: 22,
+                    width: 24,
+                    height: 24,
                     child: CircularProgressIndicator(
                       color: Colors.white,
-                      strokeWidth: 2.5,
+                      strokeWidth: 2,
                     ),
                   )
                 : Row(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.send_rounded,
-                          color: Colors.white, size: 18),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Send Message',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                      const SizedBox(width: 12),
+                      const Text(
+                        'SEND MESSAGE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),

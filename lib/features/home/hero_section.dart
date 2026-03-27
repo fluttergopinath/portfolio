@@ -6,11 +6,12 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/responsive.dart';
 
-class HeroSection extends StatelessWidget {
+class HeroSection extends StatefulWidget {
   final GlobalKey sectionKey;
   final VoidCallback onViewProjects;
   final VoidCallback onContactMe;
 
+  // Premium Hero Section with mouse-parallax and interactive depth
   const HeroSection({
     super.key,
     required this.sectionKey,
@@ -19,61 +20,130 @@ class HeroSection extends StatelessWidget {
   });
 
   @override
+  State<HeroSection> createState() => _HeroSectionState();
+}
+
+class _HeroSectionState extends State<HeroSection> {
+  Offset _mouseOffset = Offset.zero;
+
+  void _onMouseMove(PointerEvent event) {
+    if (!mounted) return;
+    final size = MediaQuery.of(context).size;
+    setState(() {
+      // Normalize to -1 to 1 range
+      _mouseOffset = Offset(
+        (event.position.dx / size.width) * 2 - 1,
+        (event.position.dy / size.height) * 2 - 1,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return ConstrainedBox(
-      key: sectionKey,
-      constraints: BoxConstraints(
-        minHeight: screenHeight,
-        minWidth: double.infinity,
-      ),
-      child: Stack(
-        fit: StackFit.passthrough,
-        children: [
-          Positioned.fill(
-            child: _ParticleBackground(
-              isDark: Theme.of(context).brightness == Brightness.dark,
+    return MouseRegion(
+      onHover: _onMouseMove,
+      child: ConstrainedBox(
+        key: widget.sectionKey,
+        constraints: BoxConstraints(
+          minHeight: screenHeight,
+          minWidth: double.infinity,
+        ),
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [
+            Positioned.fill(
+              child: _ParticleBackground(
+                isDark: Theme.of(context).brightness == Brightness.dark,
+              ),
             ),
-          ),
-          // Gradient overlay
+          // Gradient overlays for depth
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
-                  center: Alignment.topLeft,
-                  radius: 1.5,
+                  center: const Alignment(-0.8, -0.5),
+                  radius: 1.2,
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.08),
+                    AppColors.primary.withOpacity(0.1),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
           ),
-          // Content
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0.8, 0.5),
+                  radius: 1.2,
+                  colors: [
+                    AppColors.secondary.withOpacity(0.08),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+            // Multi-layered Parallax Orbs
+            Positioned(
+              top: screenHeight * 0.2,
+              left: -100,
+              child: Transform.translate(
+                offset: _mouseOffset * 30,
+                child: _ParallaxOrb(
+                  size: 400,
+                  color: AppColors.primary.withOpacity(0.15),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: screenHeight * 0.1,
+              right: -150,
+              child: Transform.translate(
+                offset: _mouseOffset * -50,
+                child: _ParallaxOrb(
+                  size: 500,
+                  color: AppColors.secondary.withOpacity(0.12),
+                ),
+              ),
+            ),
+            Positioned(
+              top: screenHeight * 0.5,
+              right: screenHeight * 0.2,
+              child: Transform.translate(
+                offset: _mouseOffset * 20,
+                child: _ParallaxOrb(
+                  size: 300,
+                  color: AppColors.accent.withOpacity(0.1),
+                ),
+              ),
+            ),
+            // Content
           Center(
             child: SizedBox(
               width: Responsive.contentWidth(context),
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 20 : 40,
-                  vertical: 60,
+                  horizontal: isMobile ? 24 : 40,
+                  vertical: 80,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment:
                       isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                   children: [
-                    // Status badge
+                    // Modern Badge
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(30),
+                        color: Colors.white.withOpacity(0.03),
+                        borderRadius: BorderRadius.circular(100),
                         border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.15),
+                          color: Colors.white.withOpacity(0.08),
                         ),
                       ),
                       child: Row(
@@ -83,161 +153,210 @@ class HeroSection extends StatelessWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4ADE80),
+                              color: const Color(0xFF00FF94),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF4ADE80).withValues(alpha: 0.5),
-                                  blurRadius: 6,
+                                  color: const Color(0xFF00FF94).withOpacity(0.5),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 10),
                           Text(
-                            'Available for work',
+                            'AVAILABLE FOR NEW PROJECTS',
                             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 2,
                                 ),
                           ),
                         ],
                       ),
                     )
                         .animate()
-                        .fadeIn(duration: 600.ms)
-                        .slideY(begin: -0.5, end: 0, duration: 600.ms),
-                    const SizedBox(height: 20),
-                    // Name with gradient
-                    ShaderMask(
-                      shaderCallback: (bounds) =>
-                          AppColors.primaryGradient.createShader(bounds),
-                      child: Text(
-                        AppStrings.name,
-                        textAlign: isMobile ? TextAlign.center : TextAlign.left,
-                        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                              color: Colors.white,
-                              fontSize: MediaQuery.of(context).size.width < 380 ? 32 : (isMobile ? 40 : 60),
-                              letterSpacing: -1,
-                              height: 1.1,
+                        .fadeIn(duration: 800.ms)
+                        .slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
+                    const SizedBox(height: 32),
+                    // High-End Typography Title
+                    Column(
+                      crossAxisAlignment: isMobile
+                          ? CrossAxisAlignment.center
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Transform.translate(
+                          offset: _mouseOffset * 20,
+                          child: Text(
+                            'I AM',
+                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                  fontSize: isMobile ? 24 : 32,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white.withOpacity(0.6),
+                                  letterSpacing: 4,
+                                ),
+                          )
+                              .animate()
+                              .fadeIn(delay: 200.ms, duration: 800.ms)
+                              .moveX(begin: -20, end: 0),
+                        ),
+                        const SizedBox(height: 8),
+                        Transform.translate(
+                          offset: _mouseOffset * 40,
+                          child: ShaderMask(
+                            shaderCallback: (bounds) =>
+                                AppColors.primaryGradient.createShader(bounds),
+                            child: Text(
+                              AppStrings.name.toUpperCase(),
+                              textAlign: isMobile ? TextAlign.center : TextAlign.left,
+                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                    fontSize: isMobile ? 48 : 96,
+                                    color: Colors.white,
+                                    height: 0.9,
+                                  ),
                             ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(delay: 200.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0, duration: 600.ms),
-                    const SizedBox(height: 8),
-                    // Typing animation
+                          )
+                              .animate()
+                              .fadeIn(delay: 400.ms, duration: 1000.ms)
+                              .slideY(begin: 0.1, end: 0),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    // Dynamic Role with Typing
                     SizedBox(
-                      height: isMobile ? 32 : 44,
+                      height: isMobile ? 40 : 60,
                       child: DefaultTextStyle(
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  fontSize: MediaQuery.of(context).size.width < 380 ? 18 : (isMobile ? 20 : 28),
-                                  fontWeight: FontWeight.w500,
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                  fontSize: isMobile ? 22 : 36,
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.white,
                                 ) ??
                             const TextStyle(),
                         child: AnimatedTextKit(
                           repeatForever: true,
-                          pause: const Duration(milliseconds: 2000),
+                          pause: const Duration(milliseconds: 1500),
                           animatedTexts: [
                             TypewriterAnimatedText(
-                              '> ${AppStrings.role}',
-                              speed: const Duration(milliseconds: 70),
+                              'FLUTTER DEVELOPER.',
+                              speed: const Duration(milliseconds: 100),
                             ),
                             TypewriterAnimatedText(
-                              '> Clean Architecture Expert',
-                              speed: const Duration(milliseconds: 70),
+                              'DIGITAL ARCHITECT.',
+                              speed: const Duration(milliseconds: 100),
                             ),
                             TypewriterAnimatedText(
-                              '> UI/UX Perfectionist',
-                              speed: const Duration(milliseconds: 70),
-                            ),
-                            TypewriterAnimatedText(
-                              '> Mobile App Innovator',
-                              speed: const Duration(milliseconds: 70),
+                              'UI/UX ENTHUSIAST.',
+                              speed: const Duration(milliseconds: 100),
                             ),
                           ],
                         ),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(delay: 500.ms, duration: 600.ms),
-                    const SizedBox(height: 14),
-                    // Subtitle
+                    ).animate().fadeIn(delay: 600.ms, duration: 800.ms),
+                    const SizedBox(height: 32),
+                    // Refined Subtitle
                     SizedBox(
-                      width: isMobile ? double.infinity : 560,
+                      width: isMobile ? double.infinity : 600,
                       child: Text(
                         AppStrings.heroSubtitle,
                         textAlign: isMobile ? TextAlign.center : TextAlign.left,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              height: 1.8,
-                              fontSize: isMobile ? 14 : 16,
+                              fontSize: isMobile ? 16 : 18,
+                              color: Colors.white.withOpacity(0.7),
+                              height: 1.6,
                             ),
                       ),
                     )
                         .animate()
-                        .fadeIn(delay: 700.ms, duration: 600.ms)
-                        .slideY(begin: 0.2, end: 0, duration: 600.ms),
-                    const SizedBox(height: 28),
-                    // CTA Buttons
+                        .fadeIn(delay: 800.ms, duration: 800.ms)
+                        .slideY(begin: 0.1, end: 0),
+                    const SizedBox(height: 48),
+                    // Premium CTAs
                     Wrap(
                       alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
-                      spacing: 16,
-                      runSpacing: 12,
+                      spacing: 24,
+                      runSpacing: 16,
                       children: [
-                        _GradientButton(
-                          label: 'View Projects',
-                          icon: Icons.rocket_launch_rounded,
-                          onTap: onViewProjects,
+                        _PremiumButton(
+                          label: 'VIEW PROJECTS',
+                          isPrimary: true,
+                          onTap: widget.onViewProjects,
                         ),
-                        _OutlineButton(
-                          label: 'Contact Me',
-                          icon: Icons.mail_outline_rounded,
-                          onTap: onContactMe,
+                        _PremiumButton(
+                          label: 'LET\'S TALK',
+                          isPrimary: false,
+                          onTap: widget.onContactMe,
                         ),
                       ],
                     )
                         .animate()
-                        .fadeIn(delay: 900.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0, duration: 600.ms),
-                    const SizedBox(height: 36),
-                    // Stats row
+                        .fadeIn(delay: 1000.ms, duration: 800.ms)
+                        .slideY(begin: 0.2, end: 0),
+                    const SizedBox(height: 60),
+                    // Minimal Stats
                     _StatsRow(isMobile: isMobile),
                   ],
                 ),
               ),
             ),
           ),
-          // Scroll indicator
+          // Scroll Indicator
           Positioned(
-            bottom: 30,
+            bottom: 40,
             left: 0,
             right: 0,
             child: Center(
               child: Column(
                 children: [
+                  Container(
+                    width: 20,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 5,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Container(
+                              width: 3,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: AppColors.secondary,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ).animate(onPlay: (c) => c.repeat()).moveY(
+                                  begin: 0,
+                                  end: 15,
+                                  duration: 1500.ms,
+                                  curve: Curves.easeInOut,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   Text(
-                    'Scroll to explore',
+                    'SCROLL',
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontSize: 12,
+                          fontSize: 10,
+                          letterSpacing: 3,
+                          color: Colors.white.withOpacity(0.4),
                         ),
                   ),
-                  const SizedBox(height: 8),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: AppColors.primary.withValues(alpha: 0.6),
-                    size: 24,
-                  ),
                 ],
-              )
-                  .animate(onPlay: (c) => c.repeat(reverse: true))
-                  .slideY(begin: 0, end: 0.3, duration: 1200.ms),
+              ),
             ),
-          )
-              .animate()
-              .fadeIn(delay: 1500.ms, duration: 800.ms),
+          ),
         ],
       ),
+      )
     );
   }
 }
@@ -253,19 +372,18 @@ class _StatsRow extends StatelessWidget {
       (AppStrings.statProjects, AppStrings.statProjectsLabel),
       (AppStrings.statExperience, AppStrings.statExperienceLabel),
       (AppStrings.statTech, AppStrings.statTechLabel),
-      (AppStrings.statClients, AppStrings.statClientsLabel),
     ];
 
     return Wrap(
       alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
-      spacing: isMobile ? 24 : 40,
-      runSpacing: 20,
+      spacing: isMobile ? 32 : 64,
+      runSpacing: 24,
       children: stats.asMap().entries.map((entry) {
         return _StatItem(
           value: entry.value.$1,
           label: entry.value.$2,
           isMobile: isMobile,
-          delay: 1100 + entry.key * 100,
+          delay: 1200 + entry.key * 150,
         );
       }).toList(),
     );
@@ -288,59 +406,53 @@ class _StatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment:
+          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
-        ShaderMask(
-          shaderCallback: (bounds) =>
-              AppColors.primaryGradient.createShader(bounds),
-          child: Text(
-            value,
-            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: isMobile ? 26 : 32,
-                ),
-          ),
-        ),
-        const SizedBox(height: 4),
         Text(
-          label,
-          textAlign: TextAlign.center,
+          value,
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: isMobile ? 32 : 44,
+                height: 1,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label.toUpperCase(),
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontSize: 12,
-                height: 1.3,
+                fontSize: 11,
+                letterSpacing: 2,
+                color: Colors.white.withOpacity(0.4),
+                height: 1.4,
               ),
         ),
       ],
     )
         .animate()
-        .fadeIn(delay: Duration(milliseconds: delay), duration: 500.ms)
-        .slideY(
-          begin: 0.3,
-          end: 0,
-          delay: Duration(milliseconds: delay),
-          duration: 500.ms,
-        );
+        .fadeIn(delay: Duration(milliseconds: delay), duration: 800.ms)
+        .slideY(begin: 0.2, end: 0);
   }
 }
 
-// ─── Buttons ───
-class _GradientButton extends StatefulWidget {
+// ─── Premium Button ───
+class _PremiumButton extends StatefulWidget {
   final String label;
-  final IconData icon;
+  final bool isPrimary;
   final VoidCallback onTap;
 
-  const _GradientButton({
+  const _PremiumButton({
     required this.label,
-    required this.icon,
+    required this.isPrimary,
     required this.onTap,
   });
 
   @override
-  State<_GradientButton> createState() => _GradientButtonState();
+  State<_PremiumButton> createState() => _PremiumButtonState();
 }
 
-class _GradientButtonState extends State<_GradientButton> {
+class _PremiumButtonState extends State<_PremiumButton> {
   bool _isHovered = false;
 
   @override
@@ -353,107 +465,38 @@ class _GradientButtonState extends State<_GradientButton> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: _isHovered
+            gradient: widget.isPrimary ? AppColors.primaryGradient : null,
+            color: widget.isPrimary ? null : Colors.transparent,
+            borderRadius: BorderRadius.circular(100),
+            border: widget.isPrimary
+                ? null
+                : Border.all(
+                    color: _isHovered ? AppColors.secondary : Colors.white.withOpacity(0.2),
+                    width: 1.5,
+                  ),
+            boxShadow: _isHovered && widget.isPrimary
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.45),
-                      blurRadius: 24,
-                      offset: const Offset(0, 8),
+                      color: AppColors.primary.withOpacity(0.4),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
                     ),
                   ]
-                : [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                : [],
           ),
           transform: _isHovered
-              ? (Matrix4.identity()..translate(0.0, -3.0, 0.0))
+              ? (Matrix4.identity()..scale(1.05))
               : Matrix4.identity(),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(widget.icon, color: Colors.white, size: 18),
-              const SizedBox(width: 10),
-              Text(
-                widget.label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OutlineButton extends StatefulWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _OutlineButton({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  State<_OutlineButton> createState() => _OutlineButtonState();
-}
-
-class _OutlineButtonState extends State<_OutlineButton> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          decoration: BoxDecoration(
-            color: _isHovered
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: _isHovered
-                  ? AppColors.primary
-                  : AppColors.primary.withValues(alpha: 0.4),
-              width: 1.5,
-            ),
-          ),
-          transform: _isHovered
-              ? (Matrix4.identity()..translate(0.0, -3.0, 0.0))
-              : Matrix4.identity(),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(widget.icon,
-                  color: AppColors.primary, size: 18),
-              const SizedBox(width: 10),
-              Text(
-                widget.label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
+          child: Text(
+            widget.label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
+                  fontSize: 14,
+                ),
           ),
         ),
       ),
@@ -479,7 +522,7 @@ class _ParticleBackgroundState extends State<_ParticleBackground>
   @override
   void initState() {
     super.initState();
-    _particles = List.generate(40, (_) => _Particle.random(_random));
+    _particles = List.generate(50, (_) => _Particle.random(_random));
     _controller = AnimationController(
       duration: const Duration(seconds: 30),
       vsync: this,
@@ -529,9 +572,9 @@ class _Particle {
     return _Particle(
       x: random.nextDouble(),
       y: random.nextDouble(),
-      radius: random.nextDouble() * 3 + 1,
-      speed: random.nextDouble() * 0.5 + 0.2,
-      opacity: random.nextDouble() * 0.3 + 0.05,
+      radius: random.nextDouble() * 2 + 0.5,
+      speed: random.nextDouble() * 0.4 + 0.1,
+      opacity: random.nextDouble() * 0.2 + 0.05,
     );
   }
 }
@@ -553,51 +596,73 @@ class _ParticlePainter extends CustomPainter {
 
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Draw gradient orbs
-    final orbPaint = Paint()..style = PaintingStyle.fill;
-
-    // Big ambient orbs
+    // Ambient orbs
     final orbs = [
-      (0.1, 0.25, 220.0, AppColors.primary, 0.06),
-      (0.8, 0.15, 180.0, AppColors.accent, 0.04),
-      (0.45, 0.75, 250.0, AppColors.primary, 0.03),
-      (0.9, 0.8, 150.0, AppColors.accent, 0.05),
+      (0.1, 0.2, 300.0, AppColors.primary, 0.04),
+      (0.9, 0.1, 250.0, AppColors.secondary, 0.03),
+      (0.5, 0.8, 350.0, AppColors.accent, 0.02),
     ];
-
     for (final orb in orbs) {
       final dx = orb.$1 * size.width +
-          sin(animationValue * 2 * pi + orb.$1 * 4) * 40;
+          sin(animationValue * 2 * pi + orb.$1 * 5) * 60;
       final dy = orb.$2 * size.height +
-          cos(animationValue * 2 * pi + orb.$2 * 4) * 40;
+          cos(animationValue * 2 * pi + orb.$2 * 5) * 60;
 
-      orbPaint.shader = RadialGradient(
+      final shader = RadialGradient(
         colors: [
-          orb.$4.withValues(alpha: orb.$5),
-          orb.$4.withValues(alpha: 0),
+          orb.$4.withOpacity(orb.$5),
+          orb.$4.withOpacity(0),
         ],
       ).createShader(
         Rect.fromCircle(center: Offset(dx, dy), radius: orb.$3),
       );
 
-      canvas.drawCircle(Offset(dx, dy), orb.$3, orbPaint);
+      paint.shader = shader;
+      canvas.drawCircle(Offset(dx, dy), orb.$3, paint);
     }
 
-    // Draw particles
+    paint.shader = null;
+    // Particles
     for (final p in particles) {
       final dx = (p.x * size.width +
-              sin(animationValue * 2 * pi * p.speed + p.x * 10) * 20) %
+              sin(animationValue * 2 * pi * p.speed + p.x * 10) * 30) %
           size.width;
       final dy = (p.y * size.height -
-              animationValue * size.height * p.speed * 0.3) %
+              animationValue * size.height * p.speed * 0.2) %
           size.height;
 
-      paint.color = (isDark ? Colors.white : AppColors.primary)
-          .withValues(alpha: p.opacity);
+      paint.color = Colors.white.withOpacity(p.opacity);
       canvas.drawCircle(Offset(dx, dy), p.radius, paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _ParticlePainter oldDelegate) =>
-      oldDelegate.animationValue != animationValue;
+  bool shouldRepaint(covariant _ParticlePainter oldDelegate) => true;
+}
+
+class _ParallaxOrb extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _ParallaxOrb({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            color,
+            color.withOpacity(0),
+          ],
+        ),
+      ),
+    );
+  }
 }

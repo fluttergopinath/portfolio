@@ -5,6 +5,8 @@ import 'about_section.dart';
 import 'skills_section.dart';
 import 'projects_section.dart';
 import '../../features/contact/contact_section.dart';
+import '../../widgets/custom_cursor.dart';
+import '../../widgets/scroll_transform_widget.dart';
 
 class HomePage extends StatefulWidget {
   final VoidCallback onThemeToggle;
@@ -41,8 +43,8 @@ class _HomePageState extends State<HomePage> {
     if (ctx != null) {
       Scrollable.ensureVisible(
         ctx,
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeInOutCubic,
+        duration: const Duration(milliseconds: 1000),
+        curve: Curves.easeInOutExpo,
       );
     }
   }
@@ -56,23 +58,44 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
+      body: CustomCursor(
+        child: Stack(
+          children: [
           // Main scrollable content
           SingleChildScrollView(
             controller: _scrollController,
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                HeroSection(
+                ScrollTransformWidget(
+                  scrollController: _scrollController,
                   sectionKey: _heroKey,
-                  onViewProjects: () => _scrollToSection(_projectsKey),
-                  onContactMe: () => _scrollToSection(_contactKey),
+                  child: HeroSection(
+                    sectionKey: _heroKey,
+                    onViewProjects: () => _scrollToSection(_projectsKey),
+                    onContactMe: () => _scrollToSection(_contactKey),
+                  ),
                 ),
-                AboutSection(sectionKey: _aboutKey),
-                SkillsSection(sectionKey: _skillsKey),
-                ProjectsSection(sectionKey: _projectsKey),
-                ContactSection(sectionKey: _contactKey),
+                ScrollTransformWidget(
+                  scrollController: _scrollController,
+                  sectionKey: _aboutKey,
+                  child: AboutSection(sectionKey: _aboutKey),
+                ),
+                ScrollTransformWidget(
+                  scrollController: _scrollController,
+                  sectionKey: _skillsKey,
+                  child: SkillsSection(sectionKey: _skillsKey),
+                ),
+                ScrollTransformWidget(
+                  scrollController: _scrollController,
+                  sectionKey: _projectsKey,
+                  child: ProjectsSection(sectionKey: _projectsKey),
+                ),
+                ScrollTransformWidget(
+                  scrollController: _scrollController,
+                  sectionKey: _contactKey,
+                  child: ContactSection(sectionKey: _contactKey),
+                ),
               ],
             ),
           ),
@@ -90,6 +113,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    );
+    ));
   }
 }
