@@ -17,71 +17,71 @@ class AppTheme {
         onSurface: AppColors.darkTextPrimary,
         tertiary: AppColors.accent,
       ),
-      textTheme: GoogleFonts.interTextTheme(
+      textTheme: GoogleFonts.outfitTextTheme(
         ThemeData.dark().textTheme,
       ).copyWith(
-        displayLarge: GoogleFonts.poppins(
-          fontSize: 72,
+        displayLarge: GoogleFonts.outfit(
+          fontSize: 88,
           fontWeight: FontWeight.w900,
+          color: AppColors.darkTextPrimary,
+          height: 0.9,
+          letterSpacing: -4,
+        ),
+        displayMedium: GoogleFonts.outfit(
+          fontSize: 64,
+          fontWeight: FontWeight.w800,
           color: AppColors.darkTextPrimary,
           height: 1.0,
           letterSpacing: -2,
         ),
-        displayMedium: GoogleFonts.poppins(
-          fontSize: 56,
-          fontWeight: FontWeight.w800,
-          color: AppColors.darkTextPrimary,
-          height: 1.1,
-          letterSpacing: -1.5,
-        ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: GoogleFonts.outfit(
           fontSize: 40,
           fontWeight: FontWeight.w700,
           color: AppColors.darkTextPrimary,
           letterSpacing: -1,
         ),
-        headlineMedium: GoogleFonts.poppins(
-          fontSize: 28,
+        headlineMedium: GoogleFonts.outfit(
+          fontSize: 32,
           fontWeight: FontWeight.w600,
           color: AppColors.darkTextPrimary,
         ),
-        titleLarge: GoogleFonts.inter(
-          fontSize: 22,
+        titleLarge: GoogleFonts.outfit(
+          fontSize: 24,
           fontWeight: FontWeight.w700,
           color: AppColors.darkTextPrimary,
         ),
-        bodyLarge: GoogleFonts.inter(
+        bodyLarge: GoogleFonts.outfit(
           fontSize: 18,
           fontWeight: FontWeight.w400,
           color: AppColors.darkTextSecondary,
           height: 1.8,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w400,
           color: AppColors.darkTextSecondary,
           height: 1.6,
         ),
-        labelLarge: GoogleFonts.inter(
+        labelLarge: GoogleFonts.outfit(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.secondary,
-          letterSpacing: 1.2,
+          letterSpacing: 2.0,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.darkSurface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: AppColors.glassBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: AppColors.glassBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         contentPadding:
@@ -91,14 +91,14 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(100),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.outfit(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
+            letterSpacing: 1.5,
           ),
           elevation: 0,
         ),
@@ -116,70 +116,70 @@ class AppTheme {
         secondary: AppColors.secondary,
         surface: AppColors.lightSurface,
       ),
-      textTheme: GoogleFonts.interTextTheme(
+      textTheme: GoogleFonts.outfitTextTheme(
         ThemeData.light().textTheme,
       ).copyWith(
-        displayLarge: GoogleFonts.poppins(
-          fontSize: 72,
+        displayLarge: GoogleFonts.outfit(
+          fontSize: 88,
           fontWeight: FontWeight.w900,
+          color: AppColors.lightTextPrimary,
+          height: 0.9,
+          letterSpacing: -4,
+        ),
+        displayMedium: GoogleFonts.outfit(
+          fontSize: 64,
+          fontWeight: FontWeight.w800,
           color: AppColors.lightTextPrimary,
           height: 1.0,
           letterSpacing: -2,
         ),
-        displayMedium: GoogleFonts.poppins(
-          fontSize: 56,
-          fontWeight: FontWeight.w800,
-          color: AppColors.lightTextPrimary,
-          height: 1.1,
-          letterSpacing: -1.5,
-        ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: GoogleFonts.outfit(
           fontSize: 40,
           fontWeight: FontWeight.w700,
           color: AppColors.lightTextPrimary,
         ),
-        headlineMedium: GoogleFonts.poppins(
-          fontSize: 28,
+        headlineMedium: GoogleFonts.outfit(
+          fontSize: 32,
           fontWeight: FontWeight.w600,
           color: AppColors.lightTextPrimary,
         ),
-        titleLarge: GoogleFonts.inter(
-          fontSize: 22,
+        titleLarge: GoogleFonts.outfit(
+          fontSize: 24,
           fontWeight: FontWeight.w700,
           color: AppColors.lightTextPrimary,
         ),
-        bodyLarge: GoogleFonts.inter(
+        bodyLarge: GoogleFonts.outfit(
           fontSize: 18,
           fontWeight: FontWeight.w400,
           color: AppColors.lightTextSecondary,
           height: 1.8,
         ),
-        bodyMedium: GoogleFonts.inter(
+        bodyMedium: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w400,
           color: AppColors.lightTextSecondary,
           height: 1.6,
         ),
-        labelLarge: GoogleFonts.inter(
+        labelLarge: GoogleFonts.outfit(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.primary,
-          letterSpacing: 1.2,
+          letterSpacing: 2.0,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.lightCard,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         contentPadding:
@@ -189,14 +189,14 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(100),
           ),
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.outfit(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
+            letterSpacing: 1.5,
           ),
           elevation: 0,
         ),
@@ -204,3 +204,4 @@ class AppTheme {
     );
   }
 }
+

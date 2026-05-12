@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../core/constants/app_colors.dart';
 import '../core/utils/responsive.dart';
 
@@ -22,64 +21,84 @@ class _CustomCursorState extends State<CustomCursor> {
     });
   }
 
-  void _onPointerEnter(PointerEvent event) {
-    setState(() => _isVisible = true);
-  }
-
-  void _onPointerExit(PointerEvent event) {
-    setState(() => _isVisible = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     if (Responsive.isMobile(context)) return widget.child;
 
     return MouseRegion(
       cursor: SystemMouseCursors.none,
-      onEnter: _onPointerEnter,
-      onExit: _onPointerExit,
+      onEnter: (_) => setState(() => _isVisible = true),
+      onExit: (_) => setState(() => _isVisible = false),
       onHover: _onPointerMove,
       child: Stack(
         children: [
           widget.child,
-          if (_isVisible)
-            Positioned(
-              left: _pointerPos.dx - 10,
-              top: _pointerPos.dy - 10,
-              child: IgnorePointer(
-                child: AnimatedContainer(
-                  duration: 150.ms,
-                  curve: Curves.easeOutCubic,
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.5),
-                      width: 1,
+          if (_isVisible) ...[
+            // Outer Glow / Ring
+            TweenAnimationBuilder<Offset>(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOutCubic,
+              tween: Tween(begin: _pointerPos, end: _pointerPos),
+              builder: (context, pos, child) {
+                return Positioned(
+                  left: pos.dx - 20,
+                  top: pos.dy - 20,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primary.withOpacity(0.3),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
-          if (_isVisible)
-             Positioned(
-              left: _pointerPos.dx - 4,
-              top: _pointerPos.dy - 4,
-              child: IgnorePointer(
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
+            // Inner Dot
+            TweenAnimationBuilder<Offset>(
+              duration: const Duration(milliseconds: 50),
+              curve: Curves.easeOutCubic,
+              tween: Tween(begin: _pointerPos, end: _pointerPos),
+              builder: (context, pos, child) {
+                return Positioned(
+                  left: pos.dx - 4,
+                  top: pos.dy - 4,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.8),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
+          ],
         ],
       ),
     );
   }
 }
+

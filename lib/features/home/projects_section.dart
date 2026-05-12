@@ -30,21 +30,25 @@ class ProjectsSection extends StatelessWidget {
                 title: AppStrings.projectsTitle,
                 subtitle: 'SHOWCASING RECENT VENTURES',
               ),
-              const SizedBox(height: 80),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: isMobile ? 1 : 2,
-                  crossAxisSpacing: 32,
-                  mainAxisSpacing: 32,
-                  childAspectRatio: isMobile ? 1.2 : 1.1,
-                ),
-                itemCount: ProjectData.projects.length,
-                itemBuilder: (context, index) {
-                  return _ProjectCard(
-                    project: ProjectData.projects[index],
-                    index: index,
+              const SizedBox(height: 100),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: isMobile ? 1 : 2,
+                      crossAxisSpacing: 48,
+                      mainAxisSpacing: 48,
+                      childAspectRatio: isMobile ? 0.9 : 1.0,
+                    ),
+                    itemCount: ProjectData.projects.length,
+                    itemBuilder: (context, index) {
+                      return _ProjectCard(
+                        project: ProjectData.projects[index],
+                        index: index,
+                      );
+                    },
                   );
                 },
               ),
@@ -70,25 +74,24 @@ class _SectionHeader extends StatelessWidget {
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 color: AppColors.secondary,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 4,
-                fontSize: 10,
+                letterSpacing: 6,
+                fontSize: 12,
               ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         Text(
           title.toUpperCase(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
                 fontWeight: FontWeight.w900,
-                fontSize: Responsive.isMobile(context) ? 32 : 48,
-                letterSpacing: -1,
+                letterSpacing: -2,
               ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 32),
         Container(
-          width: 60,
+          width: 80,
           height: 4,
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
+            gradient: AppColors.premiumGradient,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -121,68 +124,90 @@ class _ProjectCardState extends State<_ProjectCard> {
       child: GestureDetector(
         onTap: () => _showProjectDetail(context),
         child: TiltWidget(
-          maxTilt: 0.08,
-          scale: 1.02,
+          maxTilt: 0.1,
+          scale: 1.05,
           child: GlassCard(
-            borderRadius: 32,
+            borderRadius: 40,
             padding: EdgeInsets.zero,
+            opacity: _isHovered ? 0.1 : 0.05,
+            borderColor: _isHovered ? accent.withOpacity(0.5) : null,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Project Icon / Emoji with Gradient Background
+                // Project Visual with Layered Depth
                 Expanded(
-                  flex: 5,
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          accent.withOpacity(0.1),
-                          AppColors.primary.withOpacity(0.05),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(32),
-                      ),
-                    ),
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(24),
+                  flex: 6,
+                  child: Stack(
+                    children: [
+                      // Gradient Background
+                      Container(
+                        width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                          gradient: LinearGradient(
+                            colors: [
+                              accent.withOpacity(0.2),
+                              AppColors.primary.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(40),
                           ),
                         ),
-                        child: Text(
-                          widget.project.emoji,
-                          style: const TextStyle(fontSize: 48),
-                        ),
-                      ).animate(target: _isHovered ? 1 : 0).scale(
-                            begin: const Offset(1, 1),
-                            end: const Offset(1.15, 1.15),
-                            duration: 400.ms,
-                            curve: Curves.easeOutBack,
+                      ),
+                      // Floating Visual Element
+                      Center(
+                        child: Transform(
+                          transform: Matrix4.identity()
+                            ..translate(0.0, _isHovered ? -10.0 : 0.0)
+                            ..setEntry(3, 2, 0.001),
+                          child: Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.05),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: accent.withOpacity(0.2),
+                                  blurRadius: 40,
+                                  spreadRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                widget.project.emoji,
+                                style: const TextStyle(fontSize: 64),
+                              ),
+                            ),
                           ),
-                    ),
+                        ).animate(target: _isHovered ? 1 : 0).scale(
+                              begin: const Offset(1, 1),
+                              end: const Offset(1.2, 1.2),
+                              duration: 500.ms,
+                              curve: Curves.easeOutBack,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
-                // Content
+                // Content Layer
                 Expanded(
-                  flex: 5,
+                  flex: 4,
                   child: Padding(
-                    padding: const EdgeInsets.all(28),
+                    padding: EdgeInsets.all(Responsive.isMobile(context) ? 20 : 40),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           widget.project.title,
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.w900,
-                                fontSize: 24,
+                                fontSize: 28,
+                                letterSpacing: -0.5,
                               ),
                         ),
                         const SizedBox(height: 8),
@@ -190,45 +215,42 @@ class _ProjectCardState extends State<_ProjectCard> {
                           widget.project.subtitle.toUpperCase(),
                           style: Theme.of(context).textTheme.labelLarge?.copyWith(
                                 color: accent,
-                                letterSpacing: 2,
+                                letterSpacing: 3,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 11,
                               ),
                         ),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: Text(
-                            widget.project.description,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withOpacity(0.5),
-                                  height: 1.6,
-                                ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         Row(
                           children: [
                             Text(
                               'EXPLORE CASE STUDY',
-                              style:
-                                  Theme.of(context).textTheme.labelLarge?.copyWith(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1.5,
-                                      ),
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                  ),
                             ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 14,
-                              color: Colors.white.withOpacity(0.6),
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: accent.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.arrow_outward_rounded,
+                                size: 14,
+                                color: accent,
+                              ),
                             ).animate(target: _isHovered ? 1 : 0).moveX(
                                   begin: 0,
-                                  end: 6,
+                                  end: 4,
                                   duration: 300.ms,
-                                  curve: Curves.easeOutCubic,
+                                ).moveY(
+                                  begin: 0,
+                                  end: -4,
+                                  duration: 300.ms,
                                 ),
                           ],
                         ),
@@ -241,14 +263,20 @@ class _ProjectCardState extends State<_ProjectCard> {
           ),
         ),
       ),
-    ).animate().fadeIn(delay: (widget.index * 150).ms).slideY(begin: 0.2, end: 0);
+    ).animate().fadeIn(delay: (widget.index * 100).ms).scale(
+          begin: const Offset(0.9, 0.9),
+          end: const Offset(1, 1),
+          duration: 800.ms,
+          curve: Curves.easeOutBack,
+        );
   }
 
   void _showProjectDetail(BuildContext context) {
     showDialog(
       context: context,
-      barrierColor: Colors.black.withOpacity(0.85),
+      barrierColor: Colors.black.withOpacity(0.9),
       builder: (ctx) => ProjectDetailDialog(project: widget.project),
     );
   }
 }
+

@@ -8,6 +8,7 @@ class GlassCard extends StatelessWidget {
   final double opacity;
   final Color? color;
   final Border? border;
+  final Color? borderColor;
   final EdgeInsetsGeometry? padding;
   final double? width;
   final double? height;
@@ -20,6 +21,7 @@ class GlassCard extends StatelessWidget {
     this.opacity = 0.05,
     this.color,
     this.border,
+    this.borderColor,
     this.padding,
     this.width,
     this.height,
@@ -40,7 +42,7 @@ class GlassCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(borderRadius),
             border: border ??
                 Border.all(
-                  color: (color ?? Colors.white).withOpacity(0.1),
+                  color: borderColor ?? (color ?? Colors.white).withOpacity(0.1),
                   width: 1.5,
                 ),
           ),

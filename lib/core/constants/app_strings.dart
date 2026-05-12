@@ -37,33 +37,33 @@ class AppStrings {
   static const experienceTitle = 'Journey';
 
   // ─── Skills ───
-  static const skillsTitle = 'Core Expertise';
+  static const skillsTitle = 'Technical Arsenal';
   static const skillsSubtitle =
-      'A curated collection of technologies I leverage to build the future';
+      'A curated collection of technologies engineered for the future';
 
   // ─── Projects ───
-  static const projectsTitle = 'Featured Works';
+  static const projectsTitle = 'Architectural Gallery';
   static const projectsSubtitle =
-      'A showcase of premium applications built with precision and passion';
+      'A premium exhibition of digital products built with precision';
 
   // Project 1
   static const project1Title = 'Bees of Business';
-  static const project1Desc = 'A comprehensive business ecosystem platform designed for high-end networking and resource management.';
+  static const project1Desc = 'An immersive business ecosystem engineered for high-end networking, cross-sector resource scaling, and intelligent growth management.';
   static const project1Stack = 'Flutter • Firebase • Node.js';
 
   // Project 2
   static const project2Title = 'Qansult';
-  static const project2Desc = 'A premium consultation platform connecting experts with clients through a seamless, intuitive interface.';
+  static const project2Desc = 'A sophisticated digital bridge connecting world-class domain experts with clients through a seamless, glassmorphic consultation interface.';
   static const project2Stack = 'Flutter • Bloc • REST API';
 
   // Project 3
   static const project3Title = 'Swift Project';
-  static const project3Desc = 'A service-oriented application focusing on rapid delivery and high-efficiency task management.';
+  static const project3Desc = 'A high-velocity service orchestration platform meticulously designed for maximum operational efficiency and rapid task execution.';
   static const project3Stack = 'Flutter • Dart • Supabase';
 
   // Project 4
   static const project4Title = 'AllCollegeEvent';
-  static const project4Desc = 'The ultimate event management hub for academic institutions, facilitating discovery and participation.';
+  static const project4Desc = 'A centralized academic event management ecosystem facilitating discovery, engagement, and seamless participation across global institutions.';
   static const project4Stack = 'Flutter • Firebase • Cloud Functions';
 
   // ─── Contact ───

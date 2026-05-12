@@ -5,13 +5,15 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/utils/responsive.dart';
+import '../../widgets/mesh_gradient_background.dart';
+import '../../widgets/glass_card.dart';
+import '../../widgets/tilt_widget.dart';
 
 class HeroSection extends StatefulWidget {
   final GlobalKey sectionKey;
   final VoidCallback onViewProjects;
   final VoidCallback onContactMe;
 
-  // Premium Hero Section with mouse-parallax and interactive depth
   const HeroSection({
     super.key,
     required this.sectionKey,
@@ -30,7 +32,6 @@ class _HeroSectionState extends State<HeroSection> {
     if (!mounted) return;
     final size = MediaQuery.of(context).size;
     setState(() {
-      // Normalize to -1 to 1 range
       _mouseOffset = Offset(
         (event.position.dx / size.width) * 2 - 1,
         (event.position.dy / size.height) * 2 - 1,
@@ -45,414 +46,257 @@ class _HeroSectionState extends State<HeroSection> {
 
     return MouseRegion(
       onHover: _onMouseMove,
-      child: ConstrainedBox(
-        key: widget.sectionKey,
-        constraints: BoxConstraints(
-          minHeight: screenHeight,
-          minWidth: double.infinity,
-        ),
-        child: Stack(
-          fit: StackFit.passthrough,
-          children: [
-            Positioned.fill(
-              child: _ParticleBackground(
-                isDark: Theme.of(context).brightness == Brightness.dark,
-              ),
-            ),
-          // Gradient overlays for depth
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(-0.8, -0.5),
-                  radius: 1.2,
-                  colors: [
-                    AppColors.primary.withOpacity(0.1),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
+      child: MeshGradientBackground(
+        child: ConstrainedBox(
+          key: widget.sectionKey,
+          constraints: BoxConstraints(
+            minHeight: screenHeight,
+            minWidth: double.infinity,
           ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0.8, 0.5),
-                  radius: 1.2,
-                  colors: [
-                    AppColors.secondary.withOpacity(0.08),
-                    Colors.transparent,
-                  ],
+          child: Stack(
+            children: [
+              // 3D Floating Shapes in background
+              if (!isMobile) ...[
+                Positioned(
+                  top: screenHeight * 0.1,
+                  right: 100,
+                  child: _Floating3DBox(
+                    size: 150,
+                    color: AppColors.primary,
+                    mouseOffset: _mouseOffset,
+                    speed: 0.5,
+                  ),
                 ),
-              ),
-            ),
-          ),
-            // Multi-layered Parallax Orbs
-            Positioned(
-              top: screenHeight * 0.2,
-              left: -100,
-              child: Transform.translate(
-                offset: _mouseOffset * 30,
-                child: _ParallaxOrb(
-                  size: 400,
-                  color: AppColors.primary.withOpacity(0.15),
+                Positioned(
+                  bottom: screenHeight * 0.2,
+                  left: 50,
+                  child: _Floating3DBox(
+                    size: 100,
+                    color: AppColors.secondary,
+                    mouseOffset: _mouseOffset,
+                    speed: -0.8,
+                  ),
                 ),
-              ),
-            ),
-            Positioned(
-              bottom: screenHeight * 0.1,
-              right: -150,
-              child: Transform.translate(
-                offset: _mouseOffset * -50,
-                child: _ParallaxOrb(
-                  size: 500,
-                  color: AppColors.secondary.withOpacity(0.12),
+                Positioned(
+                  top: screenHeight * 0.6,
+                  right: screenHeight * 0.3,
+                  child: _Floating3DBox(
+                    size: 80,
+                    color: AppColors.accent,
+                    mouseOffset: _mouseOffset,
+                    speed: 1.2,
+                  ),
                 ),
-              ),
-            ),
-            Positioned(
-              top: screenHeight * 0.5,
-              right: screenHeight * 0.2,
-              child: Transform.translate(
-                offset: _mouseOffset * 20,
-                child: _ParallaxOrb(
-                  size: 300,
-                  color: AppColors.accent.withOpacity(0.1),
-                ),
-              ),
-            ),
-            // Content
-          Center(
-            child: SizedBox(
-              width: Responsive.contentWidth(context),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 24 : 40,
-                  vertical: 80,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment:
-                      isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-                  children: [
-                    // Modern Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.03),
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.08),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF00FF94),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF00FF94).withOpacity(0.5),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            'AVAILABLE FOR NEW PROJECTS',
-                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 2,
-                                ),
-                          ),
-                        ],
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 800.ms)
-                        .slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
-                    const SizedBox(height: 32),
-                    // High-End Typography Title
-                    Column(
-                      crossAxisAlignment: isMobile
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.start,
-                      children: [
-                        Transform.translate(
-                          offset: _mouseOffset * 20,
-                          child: Text(
-                            'I AM',
-                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                  fontSize: isMobile ? 24 : 32,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white.withOpacity(0.6),
-                                  letterSpacing: 4,
-                                ),
-                          )
-                              .animate()
-                              .fadeIn(delay: 200.ms, duration: 800.ms)
-                              .moveX(begin: -20, end: 0),
-                        ),
-                        const SizedBox(height: 8),
-                        Transform.translate(
-                          offset: _mouseOffset * 40,
-                          child: ShaderMask(
-                            shaderCallback: (bounds) =>
-                                AppColors.primaryGradient.createShader(bounds),
-                            child: Text(
-                              AppStrings.name.toUpperCase(),
-                              textAlign: isMobile ? TextAlign.center : TextAlign.left,
-                              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                                    fontSize: isMobile ? 48 : 96,
-                                    color: Colors.white,
-                                    height: 0.9,
+              ],
+
+              Center(
+                child: Container(
+                  width: Responsive.contentWidth(context),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 24 : 40,
+                    vertical: 80,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment:
+                        isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+                    children: [
+                      // Modern Badge
+                      GlassCard(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        borderRadius: 100,
+                        blur: 10,
+                        opacity: 0.05,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00FF94),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF00FF94).withOpacity(0.5),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
                                   ),
+                                ],
+                              ),
                             ),
-                          )
-                              .animate()
-                              .fadeIn(delay: 400.ms, duration: 1000.ms)
-                              .slideY(begin: 0.1, end: 0),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    // Dynamic Role with Typing
-                    SizedBox(
-                      height: isMobile ? 40 : 60,
-                      child: DefaultTextStyle(
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                  fontSize: isMobile ? 22 : 36,
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.white,
-                                ) ??
-                            const TextStyle(),
-                        child: AnimatedTextKit(
-                          repeatForever: true,
-                          pause: const Duration(milliseconds: 1500),
-                          animatedTexts: [
-                            TypewriterAnimatedText(
-                              'FLUTTER DEVELOPER.',
-                              speed: const Duration(milliseconds: 100),
-                            ),
-                            TypewriterAnimatedText(
-                              'DIGITAL ARCHITECT.',
-                              speed: const Duration(milliseconds: 100),
-                            ),
-                            TypewriterAnimatedText(
-                              'UI/UX ENTHUSIAST.',
-                              speed: const Duration(milliseconds: 100),
+                            const SizedBox(width: 12),
+                            Text(
+                              'AVAILABLE FOR NEW PROJECTS',
+                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                             ),
                           ],
                         ),
-                      ),
-                    ).animate().fadeIn(delay: 600.ms, duration: 800.ms),
-                    const SizedBox(height: 32),
-                    // Refined Subtitle
-                    SizedBox(
-                      width: isMobile ? double.infinity : 600,
-                      child: Text(
-                        AppStrings.heroSubtitle,
-                        textAlign: isMobile ? TextAlign.center : TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: isMobile ? 16 : 18,
-                              color: Colors.white.withOpacity(0.7),
-                              height: 1.6,
-                            ),
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(delay: 800.ms, duration: 800.ms)
-                        .slideY(begin: 0.1, end: 0),
-                    const SizedBox(height: 48),
-                    // Premium CTAs
-                    Wrap(
-                      alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
-                      spacing: 24,
-                      runSpacing: 16,
-                      children: [
-                        _PremiumButton(
-                          label: 'VIEW PROJECTS',
-                          isPrimary: true,
-                          onTap: widget.onViewProjects,
-                        ),
-                        _PremiumButton(
-                          label: 'LET\'S TALK',
-                          isPrimary: false,
-                          onTap: widget.onContactMe,
-                        ),
-                      ],
-                    )
-                        .animate()
-                        .fadeIn(delay: 1000.ms, duration: 800.ms)
-                        .slideY(begin: 0.2, end: 0),
-                    const SizedBox(height: 60),
-                    // Minimal Stats
-                    _StatsRow(isMobile: isMobile),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Scroll Indicator
-          Positioned(
-            bottom: 40,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 5,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Container(
-                              width: 3,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: AppColors.secondary,
-                                borderRadius: BorderRadius.circular(3),
+                      )
+                          .animate()
+                          .fadeIn(duration: 800.ms)
+                          .slideY(begin: 0.2, end: 0),
+                      const SizedBox(height: 40),
+                      
+                      // Hero Typography
+                      TiltWidget(
+                        maxTilt: 0.05,
+                        child: Column(
+                          crossAxisAlignment: isMobile
+                              ? CrossAxisAlignment.center
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'I AM',
+                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                    fontSize: isMobile ? 24 : 40,
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.white.withOpacity(0.5),
+                                    letterSpacing: 8,
+                                  ),
+                            ).animate().fadeIn(delay: 200.ms).moveX(begin: -20, end: 0),
+                            const SizedBox(height: 12),
+                            ShaderMask(
+                              shaderCallback: (bounds) =>
+                                  AppColors.premiumGradient.createShader(bounds),
+                              child: Text(
+                                AppStrings.name.toUpperCase(),
+                                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                      fontSize: isMobile ? 56 : 120,
+                                      color: Colors.white,
+                                    ),
                               ),
-                            ).animate(onPlay: (c) => c.repeat()).moveY(
-                                  begin: 0,
-                                  end: 15,
-                                  duration: 1500.ms,
-                                  curve: Curves.easeInOut,
-                                ),
+                            ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Animated Role
+                      SizedBox(
+                        height: isMobile ? 40 : 60,
+                        child: DefaultTextStyle(
+                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                fontSize: isMobile ? 24 : 44,
+                                fontWeight: FontWeight.w200,
+                                color: Colors.white,
+                              ) ??
+                              const TextStyle(),
+                          child: AnimatedTextKit(
+                            repeatForever: true,
+                            pause: const Duration(milliseconds: 2000),
+                            animatedTexts: [
+                              TypewriterAnimatedText('FLUTTER DEVELOPER.'),
+                              TypewriterAnimatedText('DIGITAL ARCHITECT.'),
+                              TypewriterAnimatedText('UI/UX ENTHUSIAST.'),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'SCROLL',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontSize: 10,
-                          letterSpacing: 3,
-                          color: Colors.white.withOpacity(0.4),
+                      ).animate().fadeIn(delay: 600.ms),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // Subtitle
+                      SizedBox(
+                        width: isMobile ? double.infinity : 700,
+                        child: Text(
+                          AppStrings.heroSubtitle,
+                          textAlign: isMobile ? TextAlign.center : TextAlign.left,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Colors.white.withOpacity(0.6),
+                              ),
                         ),
+                      ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
+                      
+                      const SizedBox(height: 64),
+                      
+                      // CTAs
+                      Wrap(
+                        alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+                        spacing: 24,
+                        runSpacing: 20,
+                        children: [
+                          _PremiumCTA(
+                            label: 'VIEW PROJECTS',
+                            onPressed: widget.onViewProjects,
+                            isPrimary: true,
+                          ),
+                          _PremiumCTA(
+                            label: 'LET\'S TALK',
+                            onPressed: widget.onContactMe,
+                            isPrimary: false,
+                          ),
+                        ],
+                      ).animate().fadeIn(delay: 1000.ms).slideY(begin: 0.2, end: 0),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              
+              // Scroll Indicator
+              Positioned(
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 1,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.white.withOpacity(0),
+                              Colors.white.withOpacity(0.5),
+                              Colors.white.withOpacity(0),
+                            ],
+                          ),
+                        ),
+                      ).animate(onPlay: (c) => c.repeat()).shimmer(duration: 2.seconds),
+                      const SizedBox(height: 16),
+                      Text(
+                        'SCROLL',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              fontSize: 10,
+                              letterSpacing: 4,
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
-      )
     );
   }
 }
 
-// ─── Stats Row ───
-class _StatsRow extends StatelessWidget {
-  final bool isMobile;
-  const _StatsRow({required this.isMobile});
-
-  @override
-  Widget build(BuildContext context) {
-    final stats = [
-      (AppStrings.statProjects, AppStrings.statProjectsLabel),
-      (AppStrings.statExperience, AppStrings.statExperienceLabel),
-      (AppStrings.statTech, AppStrings.statTechLabel),
-    ];
-
-    return Wrap(
-      alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
-      spacing: isMobile ? 32 : 64,
-      runSpacing: 24,
-      children: stats.asMap().entries.map((entry) {
-        return _StatItem(
-          value: entry.value.$1,
-          label: entry.value.$2,
-          isMobile: isMobile,
-          delay: 1200 + entry.key * 150,
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _StatItem extends StatelessWidget {
-  final String value;
+class _PremiumCTA extends StatefulWidget {
   final String label;
-  final bool isMobile;
-  final int delay;
-
-  const _StatItem({
-    required this.value,
-    required this.label,
-    required this.isMobile,
-    required this.delay,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          isMobile ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                fontSize: isMobile ? 32 : 44,
-                height: 1,
-              ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label.toUpperCase(),
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontSize: 11,
-                letterSpacing: 2,
-                color: Colors.white.withOpacity(0.4),
-                height: 1.4,
-              ),
-        ),
-      ],
-    )
-        .animate()
-        .fadeIn(delay: Duration(milliseconds: delay), duration: 800.ms)
-        .slideY(begin: 0.2, end: 0);
-  }
-}
-
-// ─── Premium Button ───
-class _PremiumButton extends StatefulWidget {
-  final String label;
+  final VoidCallback onPressed;
   final bool isPrimary;
-  final VoidCallback onTap;
 
-  const _PremiumButton({
+  const _PremiumCTA({
     required this.label,
+    required this.onPressed,
     required this.isPrimary,
-    required this.onTap,
   });
 
   @override
-  State<_PremiumButton> createState() => _PremiumButtonState();
+  State<_PremiumCTA> createState() => _PremiumCTAState();
 }
 
-class _PremiumButtonState extends State<_PremiumButton> {
+class _PremiumCTAState extends State<_PremiumCTA> {
   bool _isHovered = false;
 
   @override
@@ -460,209 +304,92 @@ class _PremiumButtonState extends State<_PremiumButton> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-          decoration: BoxDecoration(
-            gradient: widget.isPrimary ? AppColors.primaryGradient : null,
-            color: widget.isPrimary ? null : Colors.transparent,
-            borderRadius: BorderRadius.circular(100),
-            border: widget.isPrimary
-                ? null
-                : Border.all(
-                    color: _isHovered ? AppColors.secondary : Colors.white.withOpacity(0.2),
-                    width: 1.5,
-                  ),
-            boxShadow: _isHovered && widget.isPrimary
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.4),
-                      blurRadius: 30,
-                      offset: const Offset(0, 10),
-                    ),
-                  ]
-                : [],
+      child: AnimatedContainer(
+        duration: 300.ms,
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
+        child: ElevatedButton(
+          onPressed: widget.onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: widget.isPrimary ? AppColors.primary : Colors.transparent,
+            side: widget.isPrimary ? null : BorderSide(color: Colors.white.withOpacity(0.2)),
+            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
           ),
-          transform: _isHovered
-              ? (Matrix4.identity()..scale(1.05))
-              : Matrix4.identity(),
           child: Text(
             widget.label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2,
-                  fontSize: 14,
-                ),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2,
+            ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ─── Particle Background ───
-class _ParticleBackground extends StatefulWidget {
-  final bool isDark;
-  const _ParticleBackground({required this.isDark});
-
-  @override
-  State<_ParticleBackground> createState() => _ParticleBackgroundState();
-}
-
-class _ParticleBackgroundState extends State<_ParticleBackground>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late List<_Particle> _particles;
-  final _random = Random();
-
-  @override
-  void initState() {
-    super.initState();
-    _particles = List.generate(50, (_) => _Particle.random(_random));
-    _controller = AnimationController(
-      duration: const Duration(seconds: 30),
-      vsync: this,
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: _ParticlePainter(
-            particles: _particles,
-            animationValue: _controller.value,
-            isDark: widget.isDark,
+      ).animate(target: _isHovered ? 1 : 0).boxShadow(
+            begin: const BoxShadow(color: Colors.transparent, blurRadius: 0),
+            end: BoxShadow(
+              color: (widget.isPrimary ? AppColors.primary : AppColors.secondary).withOpacity(0.4),
+              blurRadius: 30,
+              spreadRadius: 2,
+            ),
           ),
-          child: const SizedBox.expand(),
-        );
-      },
     );
   }
 }
 
-class _Particle {
-  final double x;
-  final double y;
-  final double radius;
-  final double speed;
-  final double opacity;
-
-  const _Particle({
-    required this.x,
-    required this.y,
-    required this.radius,
-    required this.speed,
-    required this.opacity,
-  });
-
-  factory _Particle.random(Random random) {
-    return _Particle(
-      x: random.nextDouble(),
-      y: random.nextDouble(),
-      radius: random.nextDouble() * 2 + 0.5,
-      speed: random.nextDouble() * 0.4 + 0.1,
-      opacity: random.nextDouble() * 0.2 + 0.05,
-    );
-  }
-}
-
-class _ParticlePainter extends CustomPainter {
-  final List<_Particle> particles;
-  final double animationValue;
-  final bool isDark;
-
-  _ParticlePainter({
-    required this.particles,
-    required this.animationValue,
-    required this.isDark,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (size.isEmpty) return;
-
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // Ambient orbs
-    final orbs = [
-      (0.1, 0.2, 300.0, AppColors.primary, 0.04),
-      (0.9, 0.1, 250.0, AppColors.secondary, 0.03),
-      (0.5, 0.8, 350.0, AppColors.accent, 0.02),
-    ];
-    for (final orb in orbs) {
-      final dx = orb.$1 * size.width +
-          sin(animationValue * 2 * pi + orb.$1 * 5) * 60;
-      final dy = orb.$2 * size.height +
-          cos(animationValue * 2 * pi + orb.$2 * 5) * 60;
-
-      final shader = RadialGradient(
-        colors: [
-          orb.$4.withOpacity(orb.$5),
-          orb.$4.withOpacity(0),
-        ],
-      ).createShader(
-        Rect.fromCircle(center: Offset(dx, dy), radius: orb.$3),
-      );
-
-      paint.shader = shader;
-      canvas.drawCircle(Offset(dx, dy), orb.$3, paint);
-    }
-
-    paint.shader = null;
-    // Particles
-    for (final p in particles) {
-      final dx = (p.x * size.width +
-              sin(animationValue * 2 * pi * p.speed + p.x * 10) * 30) %
-          size.width;
-      final dy = (p.y * size.height -
-              animationValue * size.height * p.speed * 0.2) %
-          size.height;
-
-      paint.color = Colors.white.withOpacity(p.opacity);
-      canvas.drawCircle(Offset(dx, dy), p.radius, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _ParticlePainter oldDelegate) => true;
-}
-
-class _ParallaxOrb extends StatelessWidget {
+class _Floating3DBox extends StatelessWidget {
   final double size;
   final Color color;
+  final Offset mouseOffset;
+  final double speed;
 
-  const _ParallaxOrb({
+  const _Floating3DBox({
     required this.size,
     required this.color,
+    required this.mouseOffset,
+    required this.speed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color,
-            color.withOpacity(0),
+    return Transform(
+      transform: Matrix4.identity()
+        ..setEntry(3, 2, 0.001)
+        ..rotateX(mouseOffset.dy * speed * 0.5)
+        ..rotateY(mouseOffset.dx * speed * 0.5)
+        ..translate(mouseOffset.dx * 30 * speed, mouseOffset.dy * 30 * speed),
+      alignment: Alignment.center,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size * 0.2),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withOpacity(0.2),
+              color.withOpacity(0.05),
+            ],
+          ),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 40,
+              spreadRadius: 5,
+            ),
           ],
         ),
       ),
-    );
+    ).animate(onPlay: (c) => c.repeat()).moveY(
+          begin: -20,
+          end: 20,
+          duration: 4.seconds,
+          curve: Curves.easeInOut,
+        );
   }
 }
+

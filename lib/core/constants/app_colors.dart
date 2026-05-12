@@ -3,45 +3,57 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ─── Dark Theme ───
-  static const darkBackground = Color(0xFF020202);
-  static const darkSurface = Color(0xFF0A0A0A);
-  static const darkCard = Color(0xFF111111);
+  // ─── Deep Premium Dark Theme ───
+  static const darkBackground = Color(0xFF030303);
+  static const darkSurface = Color(0xFF080808);
+  static const darkCard = Color(0xFF0C0C0C);
   static const darkNavbar = Color(0xFF050505);
-
-  // ─── Light Theme ───
-  static const lightBackground = Color(0xFFF8F9FA);
+  
+  // ─── Glow & Glass Colors ───
+  static const glassBorder = Color(0x33FFFFFF);
+  static const glassHighlight = Color(0x1AFFFFFF);
+  
+  // ─── Light Theme (Minimal/Premium) ───
+  static const lightBackground = Color(0xFFFBFBFE);
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightCard = Color(0xFFF1F3F5);
   static const lightNavbar = Color(0xFFFFFFFF);
 
-  // ─── Accent & Neon ───
-  static const primary = Color(0xFF7000FF); // Electric Purple
-  static const secondary = Color(0xFF00F0FF); // Neon Cyan
-  static const accent = Color(0xFFFF00E5); // Neon Pink
+  // ─── Futuristic Accent & Neon ───
+  static const primary = Color(0xFF8B5CF6); // Modern Violet
+  static const secondary = Color(0xFF06B6D4); // Cyan/Aqua
+  static const accent = Color(0xFFEC4899); // Pink/Rose
   
-  static const primaryLight = Color(0xFF9140FF);
-  static const secondaryLight = Color(0xFF66F5FF);
+  static const primaryGlow = Color(0x668B5CF6);
+  static const secondaryGlow = Color(0x6606B6D4);
+  static const accentGlow = Color(0x66EC4899);
 
   // ─── Gradients ───
-  static const LinearGradient primaryGradient = LinearGradient(
+  static const LinearGradient premiumGradient = LinearGradient(
     colors: [primary, secondary],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const LinearGradient accentGradient = LinearGradient(
+  static const LinearGradient sunsetGradient = LinearGradient(
     colors: [primary, accent],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // ─── Text ───
-  static const darkTextPrimary = Color(0xFFFFFFFF);
-  static const darkTextSecondary = Color(0xFFA0A0A0);
-  static const darkTextTertiary = Color(0xFF606060);
+  static const LinearGradient darkGlowGradient = LinearGradient(
+    colors: [Color(0xFF1E1B4B), Color(0xFF030303)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 
-  static const lightTextPrimary = Color(0xFF121212);
-  static const lightTextSecondary = Color(0xFF495057);
-  static const lightTextTertiary = Color(0xFFADB5BD);
+  // ─── Text ───
+  static const darkTextPrimary = Color(0xFFF8FAFC);
+  static const darkTextSecondary = Color(0xFF94A3B8);
+  static const darkTextTertiary = Color(0xFF475569);
+
+  static const lightTextPrimary = Color(0xFF0F172A);
+  static const lightTextSecondary = Color(0xFF475569);
+  static const lightTextTertiary = Color(0xFF94A3B8);
 }
+
